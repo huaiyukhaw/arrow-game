@@ -169,19 +169,26 @@ public class ArrowGame extends JFrame {
 
         public void paint(Graphics grap) {
             super.paint(grap);
-
-            //System.out.println("Repaint");
-            grap.fillOval(25, maxY - 200, headSize, headSize);
+            int startX=25;
+            int startY=maxY - 175;
+//            head
+            grap.fillOval(startX, startY, headSize, headSize);
             Graphics2D g2d = (Graphics2D) grap;
             g2d.setStroke(new BasicStroke(6f));
-            g2d.drawLine(45, maxY - 160, 45, maxY-80 );
+            g2d.drawLine(startX+25, startY+20, startX+25, startY+25+bodyLength );
+//            legs
+            g2d.drawLine(startX+25, startY+25+bodyLength,10,maxY );
+            g2d.drawLine(startX+25, startY+25+bodyLength,startX+25+(startX+25-10),maxY );
+//            hand
+            g2d.drawLine(startX+25, startY+25+bodyLength/2, 10, startY+25+bodyLength/2 );
+            g2d.drawLine(startX+25, startY+25+bodyLength/2, startX+25+(startX+25-10), startY+25+bodyLength/2 );
         }
 
     }
 
     private void initializeScreen() {
-        headSize = 40;
-        bodyLength = 80;
+        headSize = 50;
+        bodyLength = 125;
     }
 
     public static void main(String args[]) {
