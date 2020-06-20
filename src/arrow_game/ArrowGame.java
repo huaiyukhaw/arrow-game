@@ -128,7 +128,7 @@ public class ArrowGame extends JFrame {
                     prevArrowPointTail.add(tailArr);
                     initializeScreen();
                 }
-//                update the value in the JLabel
+
                 repaint();
             }
         });
@@ -232,6 +232,8 @@ public class ArrowGame extends JFrame {
                     wind += 0.1;
                     break;
                 case KeyEvent.VK_DELETE:
+                    prevArrowPointHead.clear();
+                    prevArrowPointTail.clear();
                     initializeScreen();
                     myDrawPanel.repaint();
                     break;
@@ -269,8 +271,19 @@ public class ArrowGame extends JFrame {
             if (start == false) {
                 xx = (int) (ballPosX + (100 * Math.cos(angles)));
                 yy = (int) (ballPosY + (100 * Math.sin(angles)));
+                if (xx > maxX || xx < 0 || yy > maxY || yy < 0) {
+                    if (xx > maxX) {
+                        xx = maxX;
+                    } else if (xx < 0) {
+                        xx = 0;
+                    } else if (yy > maxY) {
+                        yy = maxY;
+                    } else if (yy < 0) {
+                        yy = 0;
+                    }
+                    ballDrop.stop();
+                }
             }
-
             int headX = xx;
             int headY = yy;
             int tailX = ballPosX;
@@ -299,7 +312,7 @@ public class ArrowGame extends JFrame {
 //    initialize the size and position of ball
     private void initializeScreen() {
 
-        start=true;
+        start = true;
         ballPosX = 25 + 25 + (25 + 25 - 10);
         ballPosY = maxY - 90;
         xx = (int) (ballPosX + (100 * Math.cos(15)));
