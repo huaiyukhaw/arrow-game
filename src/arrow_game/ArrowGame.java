@@ -58,8 +58,8 @@ public class ArrowGame extends JFrame {
     private double ballHeight = 0.0;
 
     final drawPanel myDrawPanel;
-    
-    boolean start=true;
+
+    boolean start = true;
 
     Timer ballDrop;
 
@@ -147,7 +147,7 @@ public class ArrowGame extends JFrame {
 
         public void mousePressed(MouseEvent event) {
 //            determine if user clicked on the ball
-            start=false;
+            start = false;
             theTempXMouse = event.getX();
             theTempYMouse = event.getY();
             double mousePos = Math.sqrt(Math.pow(theTempXMouse - ballPosX, 2) + Math.pow(theTempYMouse - ballPosY, 2));
@@ -261,7 +261,7 @@ public class ArrowGame extends JFrame {
 
             grap.setColor(Color.BLACK);
             double angles = Math.atan2(xVelocity, yVelocity);
-            if(start==false){
+            if (start == false) {
                 xx = (int) (ballPosX + (100 * Math.cos(angles)));
                 yy = (int) (ballPosY + (100 * Math.sin(angles)));
             }
@@ -270,9 +270,11 @@ public class ArrowGame extends JFrame {
             int headY = yy;
             int tailX = ballPosX;
             int tailY = ballPosY;
-            grap.drawLine(headX, headY, tailX, tailY);
-//            land
+            //            land
             grap.drawLine(0, maxY, maxX, maxY);
+            grap.setColor(Color.RED);
+            grap.drawLine(headX, headY, tailX, tailY);
+
             //System.out.println("BLACK " + i + "  " + j);
         }
     }
@@ -284,9 +286,9 @@ public class ArrowGame extends JFrame {
         ballSizeY = 50;
         ballPosX = 25 + 25 + (25 + 25 - 10);
         ballPosY = maxY - 90;
-        xx=(int) (ballPosX + (100 * Math.cos(15)));
-        yy=(int) (ballPosY + (100 * Math.sin(15)));
-        
+        xx = (int) (ballPosX + (100 * Math.cos(15)));
+        yy = (int) (ballPosY + (100 * Math.sin(15)));
+
         headSize = 50;
         bodyLength = 125;
     }
