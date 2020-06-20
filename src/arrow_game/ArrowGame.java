@@ -12,6 +12,7 @@ package arrow_game;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class ArrowGame extends JFrame {
@@ -37,8 +38,6 @@ public class ArrowGame extends JFrame {
     private int thePrevTempXMouse = 0;
     private int thePrevTempYMouse = 0;
 
-    private int ballSizeX;
-    private int ballSizeY;
     private int ballPosX;
     private int ballPosY;
     private boolean inCircle;
@@ -53,14 +52,13 @@ public class ArrowGame extends JFrame {
     private final double pixelsPerMeter = 100;
     private double wind = 0.0;
     private JLabel label;
-    private double totalEnergyLost = 0.0;
-    private double currEnergyLost = 0.0;
     private double ballHeight = 0.0;
+    ArrayList<int[]> prevArrowPointHead = new ArrayList<>();
+    ArrayList<int[]> prevArrowPointTail = new ArrayList<>();
 
     final drawPanel myDrawPanel;
 
     boolean start = true;
-    boolean end = false;
 
     Timer ballDrop;
 
@@ -124,7 +122,11 @@ public class ArrowGame extends JFrame {
                         ballPosY = maxY;
                     }
                     ballDrop.stop();
-                    end=true;
+                    int[] headArr = new int[]{xx, yy};
+                    prevArrowPointHead.add(headArr);
+                    int[] tailArr = new int[]{ballPosX, ballPosY};
+                    prevArrowPointTail.add(tailArr);
+                    initializeScreen();
                 }
 //                update the value in the JLabel
                 repaint();
@@ -152,10 +154,10 @@ public class ArrowGame extends JFrame {
             start = false;
             theTempXMouse = event.getX();
             theTempYMouse = event.getY();
-            double tempX=(theTempXMouse-ballPosX)/(xx-ballPosX);
-            double tempY=(theTempYMouse-ballPosY)/(yy-ballPosY);
+            double tempX = (theTempXMouse - ballPosX) / (xx - ballPosX);
+            double tempY = (theTempYMouse - ballPosY) / (yy - ballPosY);
 //            double mousePos = Math.sqrt(Math.pow(theTempXMouse - ballPosX, 2) + Math.pow(theTempYMouse - ballPosY, 2));
-            if (tempX==tempY) {
+            if (tempX == tempY) {
                 inCircle = true;
                 thePrevTempXMouse = theTempXMouse;
                 thePrevTempYMouse = theTempYMouse;
@@ -275,12 +277,21 @@ public class ArrowGame extends JFrame {
             int tailY = ballPosY;
             //            land
             grap.drawLine(0, maxY, maxX, maxY);
-            if(end==false)
-                grap.setColor(Color.RED);
-            else
-                grap.setColor(Color.GREEN);
-            grap.drawLine(headX, headY, tailX, tailY);      
-            
+            grap.setColor(Color.RED);
+            grap.drawLine(headX, headY, tailX, tailY);
+            if (prevArrowPointHead.size() > 0) {
+                for (int i = 0; i < prevArrowPointHead.size(); i++) {
+                    int[] headPoint = prevArrowPointHead.get(i);
+                    int[] tailPoint = prevArrowPointTail.get(i);
+                    if (i == prevArrowPointHead.size() - 1) {
+                        grap.setColor(Color.GREEN);
+                    } else {
+                        grap.setColor(Color.ORANGE);
+                    }
+                    grap.drawLine(headPoint[0], headPoint[1], tailPoint[0], tailPoint[1]);
+                }
+            }
+
             //System.out.println("BLACK " + i + "  " + j);
         }
     }
@@ -288,8 +299,7 @@ public class ArrowGame extends JFrame {
 //    initialize the size and position of ball
     private void initializeScreen() {
 
-        ballSizeX = 50;
-        ballSizeY = 50;
+        start=true;
         ballPosX = 25 + 25 + (25 + 25 - 10);
         ballPosY = maxY - 90;
         xx = (int) (ballPosX + (100 * Math.cos(15)));
