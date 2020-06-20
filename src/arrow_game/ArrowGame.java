@@ -60,6 +60,7 @@ public class ArrowGame extends JFrame {
     final drawPanel myDrawPanel;
 
     boolean start = true;
+    boolean end = false;
 
     Timer ballDrop;
 
@@ -123,6 +124,7 @@ public class ArrowGame extends JFrame {
                         ballPosY = maxY;
                     }
                     ballDrop.stop();
+                    end=true;
                 }
 //                update the value in the JLabel
                 repaint();
@@ -150,9 +152,10 @@ public class ArrowGame extends JFrame {
             start = false;
             theTempXMouse = event.getX();
             theTempYMouse = event.getY();
-            double mousePos = Math.sqrt(Math.pow(theTempXMouse - ballPosX, 2) + Math.pow(theTempYMouse - ballPosY, 2));
-            if (mousePos < ballSizeY) {
-                ballDrop.stop();
+            double tempX=(theTempXMouse-ballPosX)/(xx-ballPosX);
+            double tempY=(theTempYMouse-ballPosY)/(yy-ballPosY);
+//            double mousePos = Math.sqrt(Math.pow(theTempXMouse - ballPosX, 2) + Math.pow(theTempYMouse - ballPosY, 2));
+            if (tempX==tempY) {
                 inCircle = true;
                 thePrevTempXMouse = theTempXMouse;
                 thePrevTempYMouse = theTempYMouse;
@@ -272,9 +275,12 @@ public class ArrowGame extends JFrame {
             int tailY = ballPosY;
             //            land
             grap.drawLine(0, maxY, maxX, maxY);
-            grap.setColor(Color.RED);
-            grap.drawLine(headX, headY, tailX, tailY);
-
+            if(end==false)
+                grap.setColor(Color.RED);
+            else
+                grap.setColor(Color.GREEN);
+            grap.drawLine(headX, headY, tailX, tailY);      
+            
             //System.out.println("BLACK " + i + "  " + j);
         }
     }
