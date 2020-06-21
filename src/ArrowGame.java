@@ -1,5 +1,4 @@
 
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -27,9 +26,14 @@ public class ArrowGame extends JFrame {
     private int initArrowX = 0;
     private int initArrowY = 0;
     private String textOnDisplay;
-    
 
-    public ArrowGame(int length, int thickness, double windAcceleration, double gravity, int updateInterval, int pixelPerMeter) {
+    // get the screen size (if multiple monitor, get the size of default screen)
+    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    private int width = gd.getDisplayMode().getWidth();
+    private int height = gd.getDisplayMode().getHeight();
+
+    public ArrowGame(int length, int thickness, double windAcceleration, double gravity, int updateInterval,
+            int pixelPerMeter) {
 
         // initialize drawPanel
         myDrawPanel = new drawPanel();
@@ -50,8 +54,8 @@ public class ArrowGame extends JFrame {
         MyKeyListener myKeyListener = new MyKeyListener();
         addKeyListener(myKeyListener);
 
-        int windowXSize = 1500;
-        int windowYSize = 1000;
+        int windowXSize = width;
+        int windowYSize = height;
 
         this.setSize(windowXSize, windowYSize);
 
@@ -73,15 +77,14 @@ public class ArrowGame extends JFrame {
         this.pixelPerMeter = pixelPerMeter;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        addWindowListener(
-                new WindowAdapter() {
-                    // exit when window has closed
-                    public void windowClosed(WindowEvent event) {
-                        System.exit(0);
-                    } // end method windowClosed
-                } // end WindowAdapter inner class
+        addWindowListener(new WindowAdapter() {
+            // exit when window has closed
+            public void windowClosed(WindowEvent event) {
+                System.exit(0);
+            } // end method windowClosed
+        } // end WindowAdapter inner class
         ); // end call to addWindowListener
-        // create timer to make text appear for 3s
+           // create timer to make text appear for 3s
         textDeleter = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -95,7 +98,8 @@ public class ArrowGame extends JFrame {
         arrowHandler = new Timer(updateInterval, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                // update the ball location on each time interval based on the current ball velocity
+                // update the ball location on each time interval based on the current ball
+                // velocity
                 activeArrow.move(ax, ay);
                 frameSlider.setValue((int) activeArrow.getX() - windowXSize / 2);
                 double[] arrowCoords = activeArrow.getTipAndTail();
@@ -139,7 +143,8 @@ public class ArrowGame extends JFrame {
             idlePlayer = temp;
             ready = true;
             // create new arrow on active player hand
-            activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
+            activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(),
+                    activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
             // move the frame to show the active player
             frameSlider.setValue(activePlayer.getHandX() - this.getWidth() / 2);
         }
@@ -151,17 +156,11 @@ public class ArrowGame extends JFrame {
             // if win, display message box to ask if player wants to restart game
             int n;
             String p;
-            Object[] options = {"Yes", "No"};
+            Object[] options = { "Yes", "No" };
             p = activePlayer.isLeft() ? "Player 2" : "Player 1";
 
-            n = JOptionPane.showOptionDialog(null,
-                    p + " won. Restart game?",
-                    "Game Over",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    options,
-                    options[0]);
+            n = JOptionPane.showOptionDialog(null, p + " won. Restart game?", "Game Over", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             if (n == 0) {
                 initialize(activeArrow.getLength(), activeArrow.getThickness());
                 myDrawPanel.repaint();
@@ -177,7 +176,8 @@ public class ArrowGame extends JFrame {
         activePlayer = new Person(30, 100, maxY - 80, maxY - 30, true);
         idlePlayer = new Person(30, maxX - (r.nextInt(450) + 50), maxY - 80, maxY - 30, false);
         usedArrows = new ArrayList<>();
-        activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), length, thickness, -activePlayer.getBowAngle() * Math.PI / 180);
+        activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), length, thickness,
+                -activePlayer.getBowAngle() * Math.PI / 180);
 
         arrowIsPulledBack = false;
         ready = true;
@@ -191,20 +191,22 @@ public class ArrowGame extends JFrame {
     private class MouseHandler implements MouseListener, MouseMotionListener {
 
         public void mouseClicked(MouseEvent event) {
-        }//end public void mouseClicked(mouseEvent event)
+        }// end public void mouseClicked(mouseEvent event)
 
         public void mousePressed(MouseEvent event) {
             tempXMouse = event.getX() + transX;
             tempYMouse = event.getY();
-            // when mouse pressed, if the mouse is on the arrow, let player start pulling back
+            // when mouse pressed, if the mouse is on the arrow, let player start pulling
+            // back
             if (Math.abs(activePlayer.getHandX() - tempXMouse) <= activePlayer.getHeadR()
-                    && Math.abs(activePlayer.getHandY() - tempYMouse) <= activePlayer.getHeadR() && ready && !arrowIsPulledBack) {
+                    && Math.abs(activePlayer.getHandY() - tempYMouse) <= activePlayer.getHeadR() && ready
+                    && !arrowIsPulledBack) {
                 arrowIsPulledBack = true;
                 ready = false;
                 initArrowX = activePlayer.getHandX();
                 initArrowY = activePlayer.getHandY();
             }
-        }//end public void mousePressed(mouseEvent event)
+        }// end public void mousePressed(mouseEvent event)
 
         public void mouseDragged(MouseEvent event) {
             tempXMouse = event.getX() + transX;
@@ -217,12 +219,13 @@ public class ArrowGame extends JFrame {
                 activePlayer.updateDrag(tempXMouse, tempYMouse);
                 myDrawPanel.repaint();
             }
-        }//end public void mouseDragged(mouseEvent event)
+        }// end public void mouseDragged(mouseEvent event)
 
         public void mouseReleased(MouseEvent event) {
             tempXMouse = event.getX() + transX;
             tempYMouse = event.getY();
-            // when mouse is released, apply force to the arrow based on how far the initial mouse location is from
+            // when mouse is released, apply force to the arrow based on how far the initial
+            // mouse location is from
             // current position then start the timer handler if the mouse position is valid
             if (arrowIsPulledBack && activePlayer.checkHand(tempXMouse, tempYMouse)) {
                 tempXMouse = event.getX() + transX;
@@ -237,24 +240,39 @@ public class ArrowGame extends JFrame {
             if (!arrowHandler.isRunning()) {
                 // reset hand position if player move mouse to invalid position
                 activePlayer.resetHand();
-                activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
+                activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(),
+                        activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
                 myDrawPanel.repaint();
             }
-        }//end public void mouseReleased(mouseEvent event)
+        }// end public void mouseReleased(mouseEvent event)
 
         public void mouseEntered(MouseEvent event) {
             tempXMouse = 0;
             tempYMouse = 0;
-        }//end public void mouseEntered(mouseEvent event)
+        }// end public void mouseEntered(mouseEvent event)
 
         public void mouseExited(MouseEvent event) {
             tempXMouse = 0;
             tempYMouse = 0;
-        }//end public void mouseExited(mouseEvent event)
+        }// end public void mouseExited(mouseEvent event)
 
-        public void mouseMoved(MouseEvent mouseEvent) {
-        }//end public void mouseMoved(MouseEvent mouseEvent)
-    }//end private class MouseHandler implements MouseListener, MouseMotionListener
+        // public void mouseMoved(MouseEvent mouseEvent) {
+        // }//end public void mouseMoved(MouseEvent mouseEvent)
+
+        public void mouseMoved(MouseEvent event) {
+            tempXMouse = event.getX() + transX;
+            tempYMouse = event.getY();
+
+            // System.out.println(activeArrow);
+
+            if (tempXMouse - frameSlider.getValue() <= 50) {
+                frameSlider.setValue(frameSlider.getValue() - 125);
+            }
+            if (tempXMouse - frameSlider.getValue() >= width - 50) {
+                frameSlider.setValue(frameSlider.getValue() + 125);
+            }
+        }// end public void mouseMoved(MouseEvent mouseEvent)
+    }// end private class MouseHandler implements MouseListener, MouseMotionListener
 
     private class MyKeyListener implements KeyListener {
 
@@ -264,13 +282,13 @@ public class ArrowGame extends JFrame {
                 case KeyEvent.VK_LEFT:
                     windAcceleration -= 0.1;
                     frameSlider.setValue(frameSlider.getValue() - 50);
-//                    ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
+                    // ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
                     myDrawPanel.repaint();
                     break;
                 case KeyEvent.VK_RIGHT:
                     windAcceleration += 0.1;
                     frameSlider.setValue(frameSlider.getValue() + 50);
-//                    ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
+                    // ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
                     myDrawPanel.repaint();
                     break;
                 case KeyEvent.VK_DELETE:
