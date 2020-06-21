@@ -52,6 +52,8 @@ public class Person {
         return headY;
     }
 
+    public int getBodyX(){return bodyX1;}
+
     public int getHealth() {
         return health;
     }
@@ -180,7 +182,7 @@ public class Person {
         else
             grap2D.drawArc((int) (bowX - 0.3 * headR), (int) (bowY - headR * 0.7), (int)(headR * 2.3), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
         // draw health bar above head
-        grap2D.setColor(Color.PINK);
+        grap2D.setColor(Color.GREEN);
         for (int i=0;i<health;i++){
             if(left)
                 grap2D.fillRect(healthX+40*i+30, healthY-50, 20 , headR );
