@@ -13,7 +13,7 @@ public class ArrowGame extends JFrame {
     final drawPanel myDrawPanel;
     final JSlider frameSlider;
     private int maxX = 2500;
-    private int maxY = 800;
+    private int maxY = 900;
     private int transX = 0;
     private Arrow activeArrow;
     private Person currentPlayer, otherPlayer;
@@ -33,6 +33,7 @@ public class ArrowGame extends JFrame {
         // initialize drawPanel
         myDrawPanel = new drawPanel();
         // slider to move the frame
+        myDrawPanel.setBackground(Color.BLACK);
         frameSlider = new JSlider(0, 1000, 0);
         frameSlider.setFocusable(false);
         frameSlider.addChangeListener(new ChangeListener() {
@@ -111,8 +112,8 @@ public class ArrowGame extends JFrame {
 
     public static void main(String[] args) {
         // configure parameter here
-        int arrowLength = 30;
-        int thickness = 4;
+        int arrowLength = 50;
+        int thickness = 6;
         double gravity = 9.8; // in m/s^2 unit
         double windAcceleration = 0.0;
         int updateInterval = 10; // milliseconds
@@ -173,8 +174,8 @@ public class ArrowGame extends JFrame {
     public void initialize(int length, int thickness) {
         // function to initialize the whole game
         Random r = new Random();
-        currentPlayer = new Person(30, 100, maxY - 80, maxY - 30, true);
-        otherPlayer = new Person(30, maxX - (r.nextInt(450) + 50), maxY - 80, maxY - 30, false);
+        currentPlayer = new Person(50, 100, maxY - 175, maxY - 60, true);
+        otherPlayer = new Person(50, maxX - (r.nextInt(450) + 50), maxY - 175, maxY - 60, false);
         pastArrows = new ArrayList<>();
         activeArrow = new Arrow(currentPlayer.getHandX(), currentPlayer.getHandY(), length, thickness, -currentPlayer.getBowAngle() * Math.PI / 180);
 
@@ -290,7 +291,7 @@ public class ArrowGame extends JFrame {
 
         public void paint(Graphics grap) {
             super.paint(grap);
-            grap.setColor(Color.BLACK);
+            grap.setColor(Color.WHITE);
             Graphics2D g2d = (Graphics2D) grap;
             g2d.setStroke(new BasicStroke(6f));
             g2d.drawLine(0, maxY, maxX, maxY);
@@ -304,7 +305,7 @@ public class ArrowGame extends JFrame {
             }
             otherPlayer.draw(grap, transX, 0);
             otherPlayer.drawDefaultBowString(grap);
-            activeArrow.draw(grap, transX, 0, Color.BLACK);
+            activeArrow.draw(grap, transX, 0, Color.WHITE);
             // draw all past arrows, the most recent one is green colour
             for (int i = 0; i < pastArrows.size(); i++) {
                 Arrow a = pastArrows.get(i);
@@ -314,15 +315,6 @@ public class ArrowGame extends JFrame {
                     a.draw(grap, transX, 0, Color.YELLOW);
                 }
 
-            }
-            // if there is any text to show, display it in upper middle
-            if (!textToShow.isEmpty()) {
-                grap.setColor(Color.BLACK);
-                Font font = new Font("TimesRoman", Font.PLAIN, 32);
-                grap.setFont(font);
-                FontMetrics fontMetrics = grap.getFontMetrics(font);
-                int strLen = fontMetrics.stringWidth(textToShow);
-                grap.drawString(textToShow, (this.getWidth() / 2) - (strLen) / 2, 80);
             }
         }
 

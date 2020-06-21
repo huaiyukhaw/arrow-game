@@ -63,14 +63,6 @@ public class Arrow {
         this.y = y;
     }
 
-    public void translate(double x, double y, int maxX, int maxY) {
-        // 2d translation of the arrow location
-        this.x += x;
-        this.y += y;
-        this.x = Math.min(Math.max(this.x, length), maxX - length);
-        this.y = Math.min(Math.max(this.y, length), maxY - length);
-    }
-
     public void move(double ax, double ay) {
         // function to move the arrow at each time interval
         x += vx;
