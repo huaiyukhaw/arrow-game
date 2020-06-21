@@ -150,7 +150,8 @@ public class ArrowGame extends JFrame {
         // function to initialize the whole game
         Random r = new Random();
         activePlayer = new Person(50, 100, maxY - 175, maxY - 60, true);
-        idlePlayer = new Person(50, maxX - (r.nextInt(450) + 50), maxY - 175, maxY - 60, false);
+//        random location of P2
+        idlePlayer = new Person(50, maxX - (r.nextInt(1000-300) + 300), maxY - 175, maxY - 60, false);
         prevArrows = new ArrayList<>();
         currentArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), length, thickness, -activePlayer.getBowAngle() * Math.PI / 180);
 
