@@ -1,5 +1,3 @@
-package arrow_game;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
