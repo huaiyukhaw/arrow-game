@@ -180,9 +180,12 @@ public class Person {
         else
             grap2D.drawArc((int) (bowX - 0.3 * headR), (int) (bowY - headR * 0.7), (int)(headR * 2.3), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
         // draw health bar above head
-        grap2D.fillRect(healthX, healthY, 4 * headR, headR / 2);
         grap2D.setColor(Color.ORANGE);
-        int width = (int) (health / 5.0 * (4 * headR));
-        grap2D.fillRect(healthX, healthY, width, headR / 2);
+        for (int i=0;i<health;i++){
+            if(left)
+                grap2D.fillRect(healthX+40*i+30, healthY-50, 20 , headR );
+            else
+                grap2D.fillRect(healthX+40*i, healthY-50, 20 , headR );
+        }
     }
 }

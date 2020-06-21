@@ -16,17 +16,18 @@ public class ArrowGame extends JFrame {
     private int maxY = 900;
     private int transX = 0;
     private Arrow activeArrow;
-    private Person currentPlayer, otherPlayer;
-    private ArrayList<Arrow> pastArrows;
-    private int theTempXMouse = 0;
-    private int theTempYMouse = 0;
-    private int initArrowX = 0;
-    private int initArrowY = 0;
-    private String textToShow;
+    private Person activePlayer, idlePlayer;
+    private ArrayList<Arrow> usedArrows;
     private double ax, ay, windAcceleration;
     private Timer arrowHandler, textDeleter;
-    private boolean pullingBack, ready;
+    private boolean arrowIsPulledBack, ready;
     private int updateInterval, pixelPerMeter;
+    private int tempXMouse = 0;
+    private int tempYMouse = 0;
+    private int initArrowX = 0;
+    private int initArrowY = 0;
+    private String textOnDisplay;
+    
 
     public ArrowGame(int length, int thickness, double windAcceleration, double gravity, int updateInterval, int pixelPerMeter) {
 
@@ -55,13 +56,13 @@ public class ArrowGame extends JFrame {
 
         this.setSize(windowXSize, windowYSize);
 
-        MouseHandler myHandler = new MouseHandler();
-        myDrawPanel.addMouseListener(myHandler);
-        myDrawPanel.addMouseMotionListener(myHandler);
+        MouseHandler myMouseHandler = new MouseHandler();
+        myDrawPanel.addMouseListener(myMouseHandler);
+        myDrawPanel.addMouseMotionListener(myMouseHandler);
 
         myDrawPanel.setVisible(true);
 
-        textToShow = "";
+        textOnDisplay = "";
 
         // initialize wind acceleration and gravity
         ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
@@ -85,7 +86,7 @@ public class ArrowGame extends JFrame {
         textDeleter = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textToShow = "";
+                textOnDisplay = "";
                 myDrawPanel.repaint();
             }
         });
@@ -100,7 +101,7 @@ public class ArrowGame extends JFrame {
                 frameSlider.setValue((int) activeArrow.getX() - windowXSize / 2);
                 double[] arrowCoords = activeArrow.getTipAndTail();
                 // check hitbox
-                int hit = otherPlayer.checkHit(arrowCoords[0], arrowCoords[1]);
+                int hit = idlePlayer.checkHit(arrowCoords[0], arrowCoords[1]);
                 checkHit(arrowCoords[0], arrowCoords[1], hit);
                 myDrawPanel.repaint();
                 if (hit != 0) {
@@ -124,35 +125,35 @@ public class ArrowGame extends JFrame {
     public void checkHit(double x, double y, int hit) {
         // function to check whether arrow hit anything
         if (hit == 1) {
-            otherPlayer.reduceHealth(1);
+            idlePlayer.reduceHealth(1);
         }
         // hit ground or hit player
         if (y >= maxY || hit != 0) {
             // stop the arrow
             activeArrow.setForce(0, 0);
             arrowHandler.stop();
-            pastArrows.add(activeArrow);
+            usedArrows.add(activeArrow);
             // switch active player
-            currentPlayer.resetHand();
-            Person temp = currentPlayer;
-            currentPlayer = otherPlayer;
-            otherPlayer = temp;
+            activePlayer.resetHand();
+            Person temp = activePlayer;
+            activePlayer = idlePlayer;
+            idlePlayer = temp;
             ready = true;
             // create new arrow on active player hand
-            activeArrow = new Arrow(currentPlayer.getHandX(), currentPlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -currentPlayer.getBowAngle() * Math.PI / 180);
+            activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
             // move the frame to show the active player
-            frameSlider.setValue(currentPlayer.getHandX() - this.getWidth() / 2);
+            frameSlider.setValue(activePlayer.getHandX() - this.getWidth() / 2);
         }
     }
 
     public void checkWinCondition() {
         // if hit check if the player health is 0 or not
-        if (currentPlayer.getHealth() <= 0) {
+        if (activePlayer.getHealth() <= 0) {
             // if win, display message box to ask if player wants to restart game
             int n;
             String p;
             Object[] options = {"Yes", "No"};
-            p = currentPlayer.isLeft() ? "Player 2" : "Player 1";
+            p = activePlayer.isLeft() ? "Player 2" : "Player 1";
 
             n = JOptionPane.showOptionDialog(null,
                     p + " won. Restart game?",
@@ -174,12 +175,12 @@ public class ArrowGame extends JFrame {
     public void initialize(int length, int thickness) {
         // function to initialize the whole game
         Random r = new Random();
-        currentPlayer = new Person(50, 100, maxY - 175, maxY - 60, true);
-        otherPlayer = new Person(50, maxX - (r.nextInt(450) + 50), maxY - 175, maxY - 60, false);
-        pastArrows = new ArrayList<>();
-        activeArrow = new Arrow(currentPlayer.getHandX(), currentPlayer.getHandY(), length, thickness, -currentPlayer.getBowAngle() * Math.PI / 180);
+        activePlayer = new Person(50, 100, maxY - 175, maxY - 60, true);
+        idlePlayer = new Person(50, maxX - (r.nextInt(450) + 50), maxY - 175, maxY - 60, false);
+        usedArrows = new ArrayList<>();
+        activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), length, thickness, -activePlayer.getBowAngle() * Math.PI / 180);
 
-        pullingBack = false;
+        arrowIsPulledBack = false;
         ready = true;
     }
 
@@ -194,62 +195,62 @@ public class ArrowGame extends JFrame {
         }//end public void mouseClicked(mouseEvent event)
 
         public void mousePressed(MouseEvent event) {
-            theTempXMouse = event.getX() + transX;
-            theTempYMouse = event.getY();
+            tempXMouse = event.getX() + transX;
+            tempYMouse = event.getY();
             // when mouse pressed, if the mouse is on the arrow, let player start pulling back
-            if (Math.abs(currentPlayer.getHandX() - theTempXMouse) <= currentPlayer.getHeadR()
-                    && Math.abs(currentPlayer.getHandY() - theTempYMouse) <= currentPlayer.getHeadR() && ready && !pullingBack) {
-                pullingBack = true;
+            if (Math.abs(activePlayer.getHandX() - tempXMouse) <= activePlayer.getHeadR()
+                    && Math.abs(activePlayer.getHandY() - tempYMouse) <= activePlayer.getHeadR() && ready && !arrowIsPulledBack) {
+                arrowIsPulledBack = true;
                 ready = false;
-                initArrowX = currentPlayer.getHandX();
-                initArrowY = currentPlayer.getHandY();
+                initArrowX = activePlayer.getHandX();
+                initArrowY = activePlayer.getHandY();
             }
         }//end public void mousePressed(mouseEvent event)
 
         public void mouseDragged(MouseEvent event) {
-            theTempXMouse = event.getX() + transX;
-            theTempYMouse = event.getY();
+            tempXMouse = event.getX() + transX;
+            tempYMouse = event.getY();
             // when mouse is dragged, update the location of arrow, position of elbow
             // and bow string based on mouse movement
-            if (pullingBack && currentPlayer.checkHand(theTempXMouse, theTempYMouse)) {
-                activeArrow.setPos(theTempXMouse, theTempYMouse);
-                activeArrow.setAngle(initArrowX - theTempXMouse, initArrowY - theTempYMouse);
-                currentPlayer.updateDrag(theTempXMouse, theTempYMouse);
+            if (arrowIsPulledBack && activePlayer.checkHand(tempXMouse, tempYMouse)) {
+                activeArrow.setPos(tempXMouse, tempYMouse);
+                activeArrow.setAngle(initArrowX - tempXMouse, initArrowY - tempYMouse);
+                activePlayer.updateDrag(tempXMouse, tempYMouse);
                 myDrawPanel.repaint();
             }
         }//end public void mouseDragged(mouseEvent event)
 
         public void mouseReleased(MouseEvent event) {
-            theTempXMouse = event.getX() + transX;
-            theTempYMouse = event.getY();
+            tempXMouse = event.getX() + transX;
+            tempYMouse = event.getY();
             // when mouse is released, apply force to the arrow based on how far the initial mouse location is from
             // current position then start the timer handler if the mouse position is valid
-            if (pullingBack && currentPlayer.checkHand(theTempXMouse, theTempYMouse)) {
-                theTempXMouse = event.getX() + transX;
-                theTempYMouse = event.getY();
-                activeArrow.setPos(theTempXMouse, theTempYMouse);
+            if (arrowIsPulledBack && activePlayer.checkHand(tempXMouse, tempYMouse)) {
+                tempXMouse = event.getX() + transX;
+                tempYMouse = event.getY();
+                activeArrow.setPos(tempXMouse, tempYMouse);
                 myDrawPanel.repaint();
-                activeArrow.setForce((initArrowX - theTempXMouse) / 3.0, (initArrowY - theTempYMouse) / 3.0);
-                pullingBack = false;
+                activeArrow.setForce((initArrowX - tempXMouse) / 3.0, (initArrowY - tempYMouse) / 3.0);
+                arrowIsPulledBack = false;
                 ready = false;
                 arrowHandler.start();
             }
             if (!arrowHandler.isRunning()) {
                 // reset hand position if player move mouse to invalid position
-                currentPlayer.resetHand();
-                activeArrow = new Arrow(currentPlayer.getHandX(), currentPlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -currentPlayer.getBowAngle() * Math.PI / 180);
+                activePlayer.resetHand();
+                activeArrow = new Arrow(activePlayer.getHandX(), activePlayer.getHandY(), activeArrow.getLength(), activeArrow.getThickness(), -activePlayer.getBowAngle() * Math.PI / 180);
                 myDrawPanel.repaint();
             }
         }//end public void mouseReleased(mouseEvent event)
 
         public void mouseEntered(MouseEvent event) {
-            theTempXMouse = 0;
-            theTempYMouse = 0;
+            tempXMouse = 0;
+            tempYMouse = 0;
         }//end public void mouseEntered(mouseEvent event)
 
         public void mouseExited(MouseEvent event) {
-            theTempXMouse = 0;
-            theTempYMouse = 0;
+            tempXMouse = 0;
+            tempYMouse = 0;
         }//end public void mouseExited(mouseEvent event)
 
         public void mouseMoved(MouseEvent mouseEvent) {
@@ -295,21 +296,21 @@ public class ArrowGame extends JFrame {
             Graphics2D g2d = (Graphics2D) grap;
             g2d.setStroke(new BasicStroke(6f));
             g2d.drawLine(0, maxY, maxX, maxY);
-            currentPlayer.draw(g2d, transX, 0);
+            activePlayer.draw(g2d, transX, 0);
             // if player is pulling bow, draw pulled bow strings
-            if (ready || pullingBack) {
+            if (ready || arrowIsPulledBack) {
                 double[] arrowCoords = activeArrow.getTipAndTail();
-                currentPlayer.drawBowString(g2d, (int) arrowCoords[2], (int) arrowCoords[3]);
+                activePlayer.drawBowString(g2d, (int) arrowCoords[2], (int) arrowCoords[3]);
             } else {
-                currentPlayer.drawDefaultBowString(grap);
+                activePlayer.drawDefaultBowString(grap);
             }
-            otherPlayer.draw(grap, transX, 0);
-            otherPlayer.drawDefaultBowString(grap);
+            idlePlayer.draw(grap, transX, 0);
+            idlePlayer.drawDefaultBowString(grap);
             activeArrow.draw(grap, transX, 0, Color.WHITE);
             // draw all past arrows, the most recent one is green colour
-            for (int i = 0; i < pastArrows.size(); i++) {
-                Arrow a = pastArrows.get(i);
-                if (i == pastArrows.size() - 1) {
+            for (int i = 0; i < usedArrows.size(); i++) {
+                Arrow a = usedArrows.get(i);
+                if (i == usedArrows.size() - 1) {
                     a.draw(grap, transX, 0, Color.GREEN);
                 } else {
                     a.draw(grap, transX, 0, Color.YELLOW);
