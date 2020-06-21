@@ -37,11 +37,7 @@ public class Arrow {
         return thickness;
     }
 
-    public double getAngle() {
-        return angle;
-    }
-
-    public double[] getTipAndTail() {
+    public double[] getHeadAndTail() {
         // calculate the location of arrow tip and tail and return {tipX, tipY, tailX, tailY}
         double distX = length * Math.cos(angle);
         double distY = length * Math.sin(angle);
@@ -61,14 +57,6 @@ public class Arrow {
     public void setPos(double x, double y) {
         this.x = x;
         this.y = y;
-    }
-
-    public void translate(double x, double y, int maxX, int maxY) {
-        // 2d translation of the arrow location
-        this.x += x;
-        this.y += y;
-        this.x = Math.min(Math.max(this.x, length), maxX - length);
-        this.y = Math.min(Math.max(this.y, length), maxY - length);
     }
 
     public void move(double ax, double ay) {
@@ -96,7 +84,7 @@ public class Arrow {
         grap2D.setColor(color);
         grap2D.setStroke(new BasicStroke(thickness));
         // draw arrow body
-        double[] arrowCoords = getTipAndTail();
+        double[] arrowCoords = getHeadAndTail();
         grap2D.drawLine((int) arrowCoords[0], (int) arrowCoords[1], (int) arrowCoords[2], (int) arrowCoords[3]);
         // draw arrow tip
         Polygon arrowHead = new Polygon();
