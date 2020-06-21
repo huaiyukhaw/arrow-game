@@ -18,18 +18,16 @@ public class ArrowGame extends JFrame {
     private Arrow activeArrow;
     private Person activePlayer, idlePlayer;
     private ArrayList<Arrow> usedArrows;
-    private double ax, ay, windAcceleration;
-    private Timer arrowHandler, textDeleter;
+    private double ax, ay;
+    private Timer arrowHandler;
     private boolean arrowIsPulledBack, ready;
-    private int updateInterval, pixelPerMeter;
     private int tempXMouse = 0;
     private int tempYMouse = 0;
     private int initArrowX = 0;
     private int initArrowY = 0;
-    private String textOnDisplay;
-    
 
-    public ArrowGame(int length, int thickness, double windAcceleration, double gravity, int updateInterval, int pixelPerMeter) {
+
+    public ArrowGame(int length, int thickness, double gravity, int updateInterval, int pixelPerMeter) {
 
         // initialize drawPanel
         myDrawPanel = new drawPanel();
@@ -62,16 +60,12 @@ public class ArrowGame extends JFrame {
 
         myDrawPanel.setVisible(true);
 
-        textOnDisplay = "";
 
-        // initialize wind acceleration and gravity
-        ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
+        // initialize gravity
         ay = convertGravity(gravity, pixelPerMeter, updateInterval);
 
         initialize(length, thickness);
 
-        this.updateInterval = updateInterval;
-        this.pixelPerMeter = pixelPerMeter;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         addWindowListener(
@@ -82,15 +76,6 @@ public class ArrowGame extends JFrame {
                     } // end method windowClosed
                 } // end WindowAdapter inner class
         ); // end call to addWindowListener
-        // create timer to make text appear for 3s
-        textDeleter = new Timer(3000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textOnDisplay = "";
-                myDrawPanel.repaint();
-            }
-        });
-        textDeleter.setRepeats(false);
 
         // this the timer handler that will simulate the physics of the arrow movement
         arrowHandler = new Timer(updateInterval, new ActionListener() {
@@ -109,17 +94,6 @@ public class ArrowGame extends JFrame {
                 }
             }
         });
-    }
-
-    public static void main(String[] args) {
-        // configure parameter here
-        int arrowLength = 50;
-        int thickness = 6;
-        double gravity = 9.8; // in m/s^2 unit
-        double windAcceleration = 0.0;
-        int updateInterval = 10; // milliseconds
-        int pixelPerMeter = 100;
-        new ArrowGame(arrowLength, thickness, windAcceleration, gravity, updateInterval, pixelPerMeter);
     }
 
     public void checkHit(double x, double y, int hit) {
@@ -263,15 +237,11 @@ public class ArrowGame extends JFrame {
             switch (event.getKeyCode()) {
                 // key event to move the frame
                 case KeyEvent.VK_LEFT:
-                    windAcceleration -= 0.1;
                     frameSlider.setValue(frameSlider.getValue() - 50);
-//                    ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
                     myDrawPanel.repaint();
                     break;
                 case KeyEvent.VK_RIGHT:
-                    windAcceleration += 0.1;
                     frameSlider.setValue(frameSlider.getValue() + 50);
-//                    ax = convertGravity(windAcceleration, pixelPerMeter, updateInterval);
                     myDrawPanel.repaint();
                     break;
                 case KeyEvent.VK_DELETE:
@@ -315,9 +285,17 @@ public class ArrowGame extends JFrame {
                 } else {
                     a.draw(grap, transX, 0, Color.YELLOW);
                 }
-
             }
         }
+    }
 
+    public static void main(String[] args) {
+        // configure parameter here
+        int arrowLength = 50;
+        int thickness = 6;
+        double gravity = 9.8; // in m/s^2 unit
+        int updateInterval = 10; // milliseconds
+        int pixelPerMeter = 100;
+        new ArrowGame(arrowLength, thickness, gravity, updateInterval, pixelPerMeter);
     }
 }
