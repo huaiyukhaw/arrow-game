@@ -1,0 +1,125 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package arrow_game;
+
+/**
+ *
+ * @author Goh Jing Xuan
+ */
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+
+public class Arrow {
+    private double x;
+    private double y;
+    private int length;
+    private double vx;
+    private double vy;
+    private double angle;
+    private int thickness;
+
+    public Arrow(double x, double y, int length, int thickness, double angle) {
+        this.x = x;
+        this.y = y;
+        this.length = length;
+        this.thickness = thickness;
+        vx = 0.0;
+        vy = 0.0;
+        this.angle = angle;
+    }
+
+    // getter and setter
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getThickness() {
+        return thickness;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public double[] getTipAndTail() {
+        // calculate the location of arrow tip and tail and return {tipX, tipY, tailX, tailY}
+        double distX = length * Math.cos(angle);
+        double distY = length * Math.sin(angle);
+        double[] ans = {this.x + distX, this.y + distY, this.x - distX, this.y - distY};
+        return ans;
+    }
+
+    public void setForce(double vx, double vy) {
+        this.vx = vx;
+        this.vy = vy;
+    }
+
+    public void setAngle(double x, double y) {
+        this.angle = Math.atan2(y, x);
+    }
+
+    public void setPos(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void translate(double x, double y, int maxX, int maxY) {
+        // 2d translation of the arrow location
+        this.x += x;
+        this.y += y;
+        this.x = Math.min(Math.max(this.x, length), maxX - length);
+        this.y = Math.min(Math.max(this.y, length), maxY - length);
+    }
+
+    public void move(double ax, double ay) {
+        // function to move the arrow at each time interval
+        x += vx;
+        y += vy;
+
+        // based on wind acceleration (acceleration of x), update the x velocity at each time interval
+        vx += ax;
+        // based on gravity (acceleration of y), update the y velocity at each time interval
+        vy += ay;
+
+        // calculate angle of arrow based on new velocity
+        angle = Math.atan2(vy, vx);
+    }
+
+
+    public void draw(Graphics grap, int transX, int transY, Color color) {
+        // function to draw arrow on graphics
+        Graphics2D grap2D = (Graphics2D) grap;
+        // move the graphics based on current frame position
+        AffineTransform tx = new AffineTransform();
+        tx.translate(-transX, -transY);
+        grap2D.setTransform(tx);
+        grap2D.setColor(color);
+        grap2D.setStroke(new BasicStroke(thickness));
+        // draw arrow body
+        double[] arrowCoords = getTipAndTail();
+        grap2D.drawLine((int) arrowCoords[0], (int) arrowCoords[1], (int) arrowCoords[2], (int) arrowCoords[3]);
+        // draw arrow tip
+        Polygon arrowHead = new Polygon();
+        arrowHead.addPoint(0, thickness);
+        arrowHead.addPoint(-thickness * 2, -thickness * 3);
+        arrowHead.addPoint(thickness * 2, -thickness * 3);
+        tx.translate(arrowCoords[0], arrowCoords[1]);
+        tx.rotate((angle - Math.PI / 2d));
+        grap2D.setTransform(tx);
+        grap2D.fill(arrowHead);
+        // reset any transformation
+        grap2D.setTransform(new AffineTransform());
+    }
+}
+
