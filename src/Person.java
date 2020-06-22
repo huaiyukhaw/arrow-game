@@ -101,20 +101,20 @@ public class Person {
     }
 
     public boolean checkHand(int X, int Y) {
-        // function to check whether given position is within bow range.
+        // check whether valid range
         return (left && X > bodyX1 && X < bowX) || (!left && X < bodyX1 && X > bowX);
     }
 
     public int checkHit(double x, double y) {
-        // function to check whether the arrow hit human or not
+        // check whether the arrow hit human or not
         // 1 is hit the person, 0 is no hit
-        if ((Math.abs(x - headX) < headR && Math.abs(y - headY) < headR)||(Math.abs(x - bodyX1) < 10 && y >= headY))
+        if ((Math.abs(x - headX) < headR && Math.abs(y - headY) < headR)||(Math.abs(x - bodyX1) < 25 && y >= headY))
             return 1;
         return 0;
     }
 
     public void updateDrag(int X, int Y) {
-        // function to calculate elbow position when pulling bow
+        // calculate elbow position when pulling
         if (checkHand(X, Y)) {
             relbowX = (X + bodyX1) / 2;
             relbowY = ((Y + bodyY1) / 2) + (int) Math.sqrt(Math.pow(headR, 2) - Math.pow(bowY - Y, 2));
@@ -124,40 +124,39 @@ public class Person {
     }
 
     public void drawBowString(Graphics grap, int tailX, int tailY) {
-        // function to draw bow string when pulling
+        // draw bow string when pulling
         Graphics2D grap2D = (Graphics2D) grap;
         grap2D.setStroke(new BasicStroke(6f));
         grap2D.setColor(Color.WHITE);
         if (left) {
             grap2D.drawLine((int) (bowX - 1.2 * headR), (int) (bowY - headR * 0.7), tailX, tailY);
-            grap2D.drawLine((int) (bowX - 0.2 * headR), (int) (bowY + headR * 1.5), tailX, tailY);
+            grap2D.drawLine((int) (bowX - 0.6 * headR), (int) (bowY + headR * 1.5), tailX, tailY);
         } else {
-            grap2D.drawLine((int) (bowX + 1.2 * headR), (int) (bowY - headR * 0.6), tailX, tailY);
-            grap2D.drawLine((int) (bowX + 0.4 * headR), (int) (bowY + headR * 1.3), tailX, tailY);
+            grap2D.drawLine((int) (bowX -10+ headR), (int) (bowY - headR * 0.5), tailX, tailY);
+            grap2D.drawLine((int) (bowX + 0.2 * headR), (int) (bowY + headR * 1.5), tailX, tailY);
 
         }
     }
 
     public void drawDefaultBowString(Graphics grap) {
-        // function to draw bow string when not pulling
+        // draw bow string when not pulling
         Graphics2D grap2D = (Graphics2D) grap;
         grap2D.setStroke(new BasicStroke(6f));
         grap2D.setColor(Color.WHITE);
         if (left) {
-            grap2D.drawLine((int) (bowX - 1.2 * headR), (int) (bowY - headR * 0.7), (int) (bowX - 0.2 * headR), (int) (bowY + headR * 1.3));
+            grap2D.drawLine((int) (bowX - 1.2 * headR), (int) (bowY - headR * 0.7), (int) (bowX - 0.6 * headR), (int) (bowY + headR * 1.3));
         } else {
-            grap2D.drawLine((int) (bowX + 1.2 * headR), (int) (bowY - headR * 0.6), (int) (bowX + 0.4 * headR), (int) (bowY + headR * 1.3));
+            grap2D.drawLine((int) (bowX - 10+ headR), (int) (bowY - headR * 0.6), (int) (bowX + 0.2 * headR), (int) (bowY + headR * 1.5));
         }
     }
 
     public void draw(Graphics grap, int transX, int transY) {
-        // function to draw human on graphics
         Graphics2D grap2D = (Graphics2D) grap;
-        // move the graphics based on current frame position
+//        move frame according to frame position
         AffineTransform tx = new AffineTransform();
         tx.translate(-transX, -transY);
         grap2D.setTransform(tx);
-        // red color if player at left, blue if player at right
+
         if (left) {
             grap2D.setColor(Color.RED);
             grap.setColor(Color.RED);
@@ -167,21 +166,23 @@ public class Person {
         }
         // draw head
         grap.fillOval(headX - headR, headY - headR, headR * 2, headR * 2);
-        // draw body, hand and leg
+        // draw body
         grap2D.setStroke(new BasicStroke(headR / 5));
         grap2D.drawLine(bodyX1, bodyY1, bodyX2, bodyY2);
+//        draw legs
         grap2D.drawLine(bodyX2 - bodyLength / 3, bodyY2 + bodyLength / 2, bodyX2, bodyY2);
         grap2D.drawLine(bodyX2 + bodyLength / 3, bodyY2 + bodyLength / 2, bodyX2, bodyY2);
+//        draw hands
         grap2D.drawLine(bodyX1, bodyY1, bowX, bowY);
         grap2D.drawLine(bodyX1, bodyY1, relbowX, relbowY);
         grap2D.drawLine(relbowX, relbowY, handX, handY);
         // draw bow
         grap2D.setColor(Color.WHITE);
         if (left)
-            grap2D.drawArc((int) (bowX - 1.7 * headR), (int) (bowY - headR * 0.7), (int)(headR * 2.3), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
+            grap2D.drawArc((int) (bowX - 1.7 * headR), (int) (bowY - headR * 0.7), (int)(headR * 1.5), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
         else
-            grap2D.drawArc((int) (bowX - 0.3 * headR), (int) (bowY - headR * 0.7), (int)(headR * 2.3), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
-        // draw health bar above head
+            grap2D.drawArc((int) (bowX - 0.3 * headR), (int) (bowY - headR * 0.7), (int)(headR * 1.5), (int)(headR * 2.3), (int) -(90 - bowAngle), 180);
+        // draw health bars above head
         grap2D.setColor(Color.GREEN);
         for (int i=0;i<health;i++){
             if(left)

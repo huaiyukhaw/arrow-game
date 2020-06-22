@@ -41,8 +41,8 @@ public class Arrow {
         // calculate the location of arrow tip and tail and return {tipX, tipY, tailX, tailY}
         double distX = length * Math.cos(angle);
         double distY = length * Math.sin(angle);
-        double[] ans = {this.x + distX, this.y + distY, this.x - distX, this.y - distY};
-        return ans;
+        double[] headTailLoc = {this.x + distX, this.y + distY, this.x - distX, this.y - distY};
+        return headTailLoc;
     }
 
     public void setForce(double vx, double vy) {
@@ -86,7 +86,7 @@ public class Arrow {
         // draw arrow body
         double[] arrowCoords = getHeadAndTail();
         grap2D.drawLine((int) arrowCoords[0], (int) arrowCoords[1], (int) arrowCoords[2], (int) arrowCoords[3]);
-        // draw arrow tip
+        // draw arrow head
         Polygon arrowHead = new Polygon();
         arrowHead.addPoint(0, thickness);
         arrowHead.addPoint(-thickness * 2, -thickness * 3);
